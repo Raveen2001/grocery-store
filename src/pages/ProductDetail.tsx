@@ -12,7 +12,7 @@ export default function ProductDetail() {
   const [loading, setLoading] = useState(true);
   const [quantity, setQuantity] = useState(1);
   const [activeTab, setActiveTab] = useState<"description" | "nutrition" | "reviews">("description");
-  const { addToCart, cart } = useStore();
+  const { addToCart, updateQuantity, cart } = useStore();
 
   const cartItem = cart.find((item) => item.product.id === id);
 
@@ -124,30 +124,53 @@ export default function ProductDetail() {
           </div>
 
           {/* Quantity + Add to Cart */}
-          <div className="flex items-center gap-4 mb-6">
-            <div className="flex items-center border border-gray-200 rounded-xl overflow-hidden">
+          {cartItem ? (
+            <div className="flex items-center gap-4 mb-6">
+              <div className="flex items-center border border-gray-200 rounded-xl overflow-hidden">
+                <button
+                  onClick={() => updateQuantity(product.id, cartItem.quantity - 1)}
+                  className="w-10 h-10 flex items-center justify-center hover:bg-gray-50 transition"
+                >
+                  <Minus size={16} />
+                </button>
+                <span className="w-12 text-center font-semibold">{cartItem.quantity}</span>
+                <button
+                  onClick={() => updateQuantity(product.id, cartItem.quantity + 1)}
+                  className="w-10 h-10 flex items-center justify-center hover:bg-gray-50 transition"
+                >
+                  <Plus size={16} />
+                </button>
+              </div>
+              <div className="flex-1 bg-brand-50 text-brand-700 py-3 rounded-xl font-bold text-lg flex items-center justify-center gap-2">
+                <ShoppingCart size={20} />
+                {cartItem.quantity} in cart &middot; {formatPrice(product.price * cartItem.quantity)}
+              </div>
+            </div>
+          ) : (
+            <div className="flex items-center gap-4 mb-6">
+              <div className="flex items-center border border-gray-200 rounded-xl overflow-hidden">
+                <button
+                  onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                  className="w-10 h-10 flex items-center justify-center hover:bg-gray-50 transition"
+                >
+                  <Minus size={16} />
+                </button>
+                <span className="w-12 text-center font-semibold">{quantity}</span>
+                <button
+                  onClick={() => setQuantity(quantity + 1)}
+                  className="w-10 h-10 flex items-center justify-center hover:bg-gray-50 transition"
+                >
+                  <Plus size={16} />
+                </button>
+              </div>
               <button
-                onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                className="w-10 h-10 flex items-center justify-center hover:bg-gray-50 transition"
+                onClick={handleAddToCart}
+                className="flex-1 bg-brand-600 hover:bg-brand-700 text-white py-3 rounded-xl font-bold text-lg transition flex items-center justify-center gap-2"
               >
-                <Minus size={16} />
-              </button>
-              <span className="w-12 text-center font-semibold">{quantity}</span>
-              <button
-                onClick={() => setQuantity(quantity + 1)}
-                className="w-10 h-10 flex items-center justify-center hover:bg-gray-50 transition"
-              >
-                <Plus size={16} />
+                <ShoppingCart size={20} /> Add to Cart
               </button>
             </div>
-            <button
-              onClick={handleAddToCart}
-              className="flex-1 bg-brand-600 hover:bg-brand-700 text-white py-3 rounded-xl font-bold text-lg transition flex items-center justify-center gap-2"
-            >
-              <ShoppingCart size={20} />
-              {cartItem ? `Add More (${cartItem.quantity} in cart)` : "Add to Cart"}
-            </button>
-          </div>
+          )}
 
           {/* Shipping info */}
           <div className="space-y-3 p-4 bg-gray-50 rounded-xl">
